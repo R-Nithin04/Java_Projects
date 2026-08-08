@@ -1,0 +1,22 @@
+package model;
+
+public class Transaction 
+{
+	private int transactionid;
+	private long accountnumber;
+	private String transactiontype;
+	private double amount;
+	private String transactiondate;
+	public Transaction()
+	{
+		
+	}
+	public Transaction(int transaction_id,long account_number,String transaction_type,double amount,String transaction_date)
+	{
+		this.transactionid=transactionid;
+		this.accountnumber=accountnumber;
+		this.transactiontype=transactiontype;
+		this.amount=amount;
+		this.transactiondate=transactiondate;
+	}
+}
