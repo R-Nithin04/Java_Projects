@@ -1,0 +1,65 @@
+package dao;
+import java.sql.*;
+import database.DBConnection;
+import model.Account;
+
+public class AccountDAO 
+{
+	public void addAccount(Account account)
+	{
+		Connection con=DBConnection.getConnection();
+		try
+		{
+			String sql="INSERT INTO Account VALUES(?,?,?,?)";
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setLong(1,account.getAccountNumber());
+			ps.setInt(2,account.getCustomerId());
+			ps.setString(3,account.getAccountType());
+			ps.setDouble(4,account.getBalance());
+			int rows=ps.executeUpdate();
+			if(rows>0)
+			{
+				System.out.println("Account Added");
+			}
+			else
+			{
+				System.out.println("Account not Added");
+			}
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void viewAccount()
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="SELECT * FROM ACCOUNT";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ResultSet rs=ps.executeQuery();
+			while(rs.next())
+			{
+				Long id=rs.getLong("account_number");
+				int cid=rs.getInt("customer_id");
+				String actype=rs.getString("account_type");
+				Double bal=rs.getDouble("balance");
+				System.out.println("ACCOUNT NUMBER => "
+									+id+"\nCUSTOMER ID=>"
+									+cid+"\nACCOUNT TYPE => "
+									+actype+"\nBALANCE => "
+									+bal);
+			}
+			rs.close();
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+}

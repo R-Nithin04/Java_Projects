@@ -1,0 +1,18 @@
+package dao;
+import java.sql.*;
+import database.DBConnection;
+import model.Account;
+
+public class AccountDAO 
+{
+	public void addAccount(Account account)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="INSERT INTO Account VALUES(?,?,?,?)";
+		PreparedStatement ps=con.prepareStatement(sql);
+		ps.setLong(1,account.getAccountNumber());
+		ps.setInt(2,account.getCustomerId());
+		ps.setString(3,account.getAccountType());
+		ps.setDouble(4,account.getBalance());
+	}
+}

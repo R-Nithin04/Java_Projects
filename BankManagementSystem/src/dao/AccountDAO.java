@@ -1,0 +1,239 @@
+package dao;
+import java.sql.*;
+import database.DBConnection;
+import model.Account;
+
+public class AccountDAO 
+{
+	public void addAccount(Account account)
+	{
+		Connection con=DBConnection.getConnection();
+		try
+		{
+			String sql="INSERT INTO Account VALUES(?,?,?,?)";
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setLong(1,account.getAccountNumber());
+			ps.setInt(2,account.getCustomerId());
+			ps.setString(3,account.getAccountType());
+			ps.setDouble(4,account.getBalance());
+			int rows=ps.executeUpdate();
+			if(rows>0)
+			{
+				System.out.println("Account Added");
+			}
+			else
+			{
+				System.out.println("Account not Added");
+			}
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void viewAccount()
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="SELECT * FROM ACCOUNT";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ResultSet rs=ps.executeQuery();
+			while(rs.next())
+			{
+				long id=rs.getLong("account_number");
+				int cid=rs.getInt("customer_id");
+				String actype=rs.getString("account_type");
+				double bal=rs.getDouble("balance");
+				System.out.println("ACCOUNT NUMBER => "
+									+id+"\nCUSTOMER ID=>"
+									+cid+"\nACCOUNT TYPE => "
+									+actype+"\nBALANCE => "
+									+bal);
+			}
+			rs.close();
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void updateAccount(Account account)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="UPDATE ACCOUNT SET customer_id=?,account_type=?,balance=? WHERE ACCOUNT_NUMBER=?";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setInt(1,account.getCustomerId());
+			ps.setString(2,account.getAccountType());
+			ps.setDouble(3,account.getBalance());
+			ps.setLong(4,account.getAccountNumber());
+			int rows=ps.executeUpdate();
+			if(rows>0)
+			{
+				System.out.println("UPDATE SUCCESS");
+			}
+			else
+			{
+				System.out.println("UPDATE UNSUCCESSFUL");
+			}
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void deleteAccount(Account account)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="DELETE FROM Account WHERE Account_number=?";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setLong(1,account.getAccountNumber());
+			int rows=ps.executeUpdate();
+			if(rows>0)
+			{
+				System.out.println("DELETION SUCCESSFUL");
+			}
+			else
+			{
+				System.out.println("DELETION UNSUCCESSFUL");
+			}
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}	
+	}
+	public void deposit(long account_number,double amount)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="UPDATE Account SET balance=balance+? WHERE Account_number=?";
+		try
+		{
+			if(amount<=0)
+			{
+				System.out.println("Invalid Amount");
+				con.close();
+				return;
+			}
+			else
+			{
+				PreparedStatement ps=con.prepareStatement(sql);
+				ps.setDouble(1, amount);
+				ps.setLong(2,account_number);
+				int rows=ps.executeUpdate();
+				if(rows>0)
+				{
+					System.out.println("Amount Deposited Successfully");
+				}
+				else
+				{
+					System.out.println("Account not found");
+				}
+				ps.close();
+			}
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void withdraw(long account_number,double amount)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="UPDATE Account SET balance=balance-? WHERE Account_number=?";
+		String bal="SELECT balance FROM Account WHERE Account_number=?";
+		try
+		{
+			if(amount<=0)
+			{
+				System.out.println("INVALID AMOUNT");
+				con.close();
+				return;
+			}
+			else
+			{
+				PreparedStatement ps=con.prepareStatement(bal);
+				ps.setLong(1, account_number);
+				ResultSet rs=ps.executeQuery();
+				if(rs.next())
+				{
+					double balance=rs.getDouble("balance");
+					if(amount>balance)
+					{
+						System.out.println("Insufficient Balance");
+						ps.close();
+						con.close();
+						rs.close();
+						return;
+					}
+					else
+					{
+						PreparedStatement ps2=con.prepareStatement(sql);
+						ps2.setDouble(1, amount);
+						ps2.setLong(2,account_number);
+						int rows=ps2.executeUpdate();
+						if(rows>0)
+						{
+							System.out.println("Withdraw Success");
+						}
+						else
+						{
+							System.out.println("Withdraw Unsuccessful");
+						}
+						ps2.close();
+					}
+					ps.close();
+					rs.close();
+					con.close();
+				}
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void checkBalance(long account_number)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="SELECT balance FROM Account WHERE account_number=?";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setLong(1, account_number);
+			ResultSet rs=ps.executeQuery();
+			if(rs.next())
+			{
+				double bal=rs.getDouble("balance");
+				System.out.println("ACCOUNT NUMBER =>"
+									+account_number
+									+"\nBALANCE => "
+									+bal);
+			}
+			else
+			{
+				System.out.println("Account Not found");
+			}
+			rs.close();
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+}

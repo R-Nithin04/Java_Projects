@@ -1,0 +1,119 @@
+package dao;
+import database.DBConnection;
+import model.Customer;
+
+import java.sql.*;
+public class CustomerDAO 
+{
+	public  void addCustomer(Customer customer)
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="INSERT INTO Customer VALUES(?,?,?,?,?)";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ps.setInt(1,customer.getCustomerId());
+			ps.setString(2,customer.getFullName());
+			ps.setString(3,customer.getPhone());
+			ps.setString(4,customer.getEmail());
+			ps.setString(5,customer.getAddress());
+			int rows=ps.executeUpdate();
+			if(rows>0)
+			{
+				System.out.println("Customer Added");
+			}
+			else
+			{
+				System.out.println("Customer Not Added");
+			}
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void viewCustomer()
+	{
+		Connection con=DBConnection.getConnection();
+		String sql="SELECT * FROM Customer";
+		try
+		{
+			PreparedStatement ps=con.prepareStatement(sql);
+			ResultSet rs=ps.executeQuery();
+			while(rs.next())
+			{
+				int id=rs.getInt("customer_Id");
+				String name=rs.getString("full_name");
+				String phone=rs.getString("phone");
+				String email=rs.getString("email");
+				String address=rs.getString("address");
+				System.out.println(" ID => "+id
+									+"\n Name => "+name
+									+"\n Phone => "+phone
+									+"\n Email => "+email
+									+"\n Address =>"+address);
+			}
+			rs.close();
+			ps.close();
+			con.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+		public void updateCustomer(Customer customer)
+		{
+			Connection con=DBConnection.getConnection();
+			try
+			{
+				String sql="UPDATE Customer SET full_name=?,phone=?,email=?,address=? WHERE customer_id=?";
+				PreparedStatement ps=con.prepareStatement(sql);
+				ps.setString(1,customer.getFullName());
+				ps.setString(2,customer.getPhone());
+				ps.setString(3,customer.getEmail());
+				ps.setString(4,customer.getAddress());
+				ps.setInt(5,customer.getCustomerId());
+				int rows=ps.executeUpdate();
+				if(rows>0)
+				{
+					System.out.println("Customer Update Success");
+				}
+				else
+				{
+					System.out.println("Update Failed");
+				}
+				ps.close();
+				con.close();
+			}
+			catch(SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		public void deleteCustomer(Customer customer)
+		{
+			Connection con=DBConnection.getConnection();
+			try
+			{
+				String sql="DELETE FROM CUSTOMER WHERE CUSTOMERID=?";
+				PreparedStatement ps=con.prepareStatement(sql);
+				ps.setInt(1,customer.getCustomerId());
+				int rows=ps.executeUpdate();
+				if(rows>0)
+				{
+					System.out.println("Customer Deleted");
+				}
+				else
+				{
+					System.out.println("Customer Not Deleted");
+				}
+			}
+			catch(SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
